@@ -103,3 +103,94 @@ ansible_become: yes — использовать sudo при выполнени�
 понял, как строить дашборды и как хранить их в файлах
 
 Получился хороший фундамент для дальнейшего изучения DevOps инструментов.
+
+
+# Нужно добавить инфомармацию про пелйбуки и их разбиение 
+```yaml
+- name: User and backup setup
+  hosts: all
+  become: yes
+
+  vars:
+    username: "backupuser"
+    backup_dir: "/opt/backup"
+    source_dir: "/var/www"
+    cron_script: "/usr/local/bin/backup.sh"
+
+  tasks:
+    - name: Create user
+      user:
+        name: "{{ username }}"
+        shell: /bin/bash
+
+    - name: Create backup directory
+      file:
+        path: "{{ backup_dir }}"
+        state: directory
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0755"
+
+    - name: Create backup script
+      copy:
+        dest: "{{ cron_script }}"
+        mode: "0755"
+        content: |
+          #!/bin/bash
+          tar -czf {{ backup_dir }}/backup_$(date +%F).tar.gz {{ source_dir }}
+
+    - name: Add cron job (every 3 days)
+      cron:
+        name: "Backup every 3 days"
+        user: "{{ username }}"
+        job: "{{ cron_script }}"
+        minute: "0"
+        hour: "3"
+        day: "*/3"
+```
+
+## Тут описал монолитый подход который дальше нужно было разбить , можно делать и так, но если хочу переиспользовать одну функцию плюсов мало
+### А вот далее разбиваю первым делом плейбук на мини-плейбуки , на роли, и описываю единый плейбук в которой просто использую роли
+- name: Setup user, directory and backups
+   hosts: all become: yes
+   vars:
+      username: "backupuser"
+      backup_dir: "/opt/backup"
+      source_dir: "/var/www"
+  roles:
+   - user
+   - directory
+   - backup
+```
+```yaml
+- name: Create user
+  user:
+    name: "{{ username }}"
+    shell: /bin/bash
+```
+```yaml
+  - name: Create backup directory
+    file:
+      path: "{{ backup_dir }}"
+      state: directory
+      owner: "{{ username }}"
+      group: "{{ username }}"
+      mode: "0755"
+```
+```yaml
+- name: Install backup script
+  template:
+    src: backup.sh.j2
+    dest: /usr/local/bin/backup.sh
+    mode: "0755"
+
+- name: Add cron job (every 3 days)
+  cron:
+    name: "Backup every 3 days"
+    user: "{{ username }}"
+    job: "/usr/local/bin/backup.sh"
+    minute: "0"
+    hour: "3"
+    day: "*/3"
+```
+

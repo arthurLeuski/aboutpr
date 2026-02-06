@@ -34,8 +34,11 @@ server {
 }
 ### Краткое описание ключевых параметров
 autoindex on — включает отображение списка файлов вместо index.html
+
 autoindex_localtime on — показывает локальное время изменения файлов
+
 Content-Disposition "attachment" — браузер скачивает файл, а не открывает
+
 try_files — отдаёт файл, иначе возвращает 404
 
 После внесения изменений перезагрузил конфигурацию:
@@ -52,26 +55,41 @@ sudo apt install vsftpd -y
 Отредактировал /etc/vsftpd.conf, чтобы можно было подключаться по FTP и загружать файлы в ту же директорию, что использует Nginx.
 
 Основные параметры:
-
-Код
 anonymous_enable=NO
+
 write_enable=YES
+
 chroot_local_user=YES
+
 chroot_list_enable=YES
+
 chroot_list_file=/etc/vsftpd.chroot_list
+
 allow_writeable_chroot=YES
+
 local_root=/var/www/fileexchange
+
 xferlog_enable=YES
+
 pasv_enable=YES
+
 pasv_min_port=40000
+
 pasv_max_port=50000
+
 pasv_address=IP_ADDR
+
 seccomp_sandbox=NO
 ### Что дают эти настройки
+
 anonymous_enable=NO — отключает анонимный доступ
+
 write_enable=YES — разрешает загрузку файлов
+
 local_root=/var/www/fileexchange — сразу попадаю в нужную директорию
+
 pasv_enable=YES — корректная работа FileZilla
+
 chroot_local_user=YES — пользователь не может выйти выше своей директории
 
 3. Настройка SFTP

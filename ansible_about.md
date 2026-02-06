@@ -64,8 +64,10 @@ all:
       ansible_host: 192.168.31.24
       ansible_user: devops
       ansible_become: yes
-ansible_become: yes — использовать sudo при выполнении задач.
+
 ```
+ansible_become: yes — использовать sudo при выполнении задач.
+
 ## Первые плейбуки
 ```yaml
 - name: Создать папку

@@ -99,16 +99,25 @@ ssh
 Subsystem sftp internal-sftp
 
 Match User arthur
+
     ForceCommand internal-sftp
+    
     ChrootDirectory /var/www
+    
     PermitTunnel no
+    
     AllowAgentForwarding no
+    
     AllowTcpForwarding no
+    
     X11Forwarding no
 ### Смысл настроек
 internal-sftp — используется встроенный SFTP
+
 Match User arthur — правила применяются только к моему пользователю
+
 ChrootDirectory /var/www — пользователь не может выйти выше этой директории
+
 ForceCommand internal-sftp — доступ только к файлам, без возможности выполнять команды
 
 4. Итог
